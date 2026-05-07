@@ -39,6 +39,10 @@ To test the system without hardware, open three terminals:
    ```powershell
    $env:PYTHONPATH = "."; python api/lsl_receiver.py
    ```
+4. **Terminal 4: Start Visualization Dashboard**
+   ```powershell
+   streamlit run api/dashboard.py
+   ```
 
 ## 📂 Project Structure
 - `api/`: FastAPI server, LSL utilities, and simulators.

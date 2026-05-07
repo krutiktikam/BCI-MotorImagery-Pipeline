@@ -7,6 +7,13 @@ from api.utils import apply_bandpass, prepare_input
 
 app = FastAPI(title="NeuroRehab-BCI Inference API")
 
+# Global state for latest prediction
+latest_prediction = {
+    "prediction": "idle",
+    "confidence": 0.0,
+    "all_probabilities": {}
+}
+
 # Load model
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 # We need the same params as used in training
@@ -31,8 +38,13 @@ class SignalWindow(BaseModel):
 def read_root():
     return {"message": "BCI Inference API is running."}
 
+@app.get("/latest")
+async def get_latest():
+    return latest_prediction
+
 @app.post("/predict")
 async def predict(window: SignalWindow):
+    global latest_prediction
     try:
         # Convert to numpy
         arr = np.array(window.data)
@@ -50,11 +62,14 @@ async def predict(window: SignalWindow):
         
         classes = ['left_hand', 'right_hand', 'feet', 'tongue']
         
-        return {
+        res = {
             "prediction": classes[predicted.item()],
             "confidence": probabilities[0][predicted.item()].item(),
             "all_probabilities": {classes[i]: probabilities[0][i].item() for i in range(len(classes))}
         }
+        
+        latest_prediction = res
+        return res
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
