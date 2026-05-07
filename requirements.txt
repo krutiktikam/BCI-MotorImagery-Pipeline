@@ -1,0 +1,12 @@
+mne
+moabb
+torch
+torchvision
+fastapi
+uvicorn
+numpy
+pandas
+matplotlib
+scikit-learn
+scipy
+pylsl
